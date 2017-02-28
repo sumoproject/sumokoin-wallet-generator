@@ -8551,6 +8551,14 @@ var aeonConfig = {
     coinUriPrefix: 'aeon:',
     addressPrefix: 0xB2
 };
+var sumokoinConfig = {
+    coinUnitPlaces: 9,
+    coinSymbol: 'SUMO',
+    coinName: 'Sumokoin',
+    coinUriPrefix: 'sumo:',
+    addressPrefix: 0x2bb39a
+};
+
 var cnUtilGen = function(initConfig) {
     //var config = $.extend({}, initConfig);
     var config = initConfig;
@@ -10727,14 +10735,15 @@ bC0zLjUsMjAuNGgtNkwyNDQuOCwzMTAuNkwyNDQuOCwzMTAuNnoiLz4KPC9nPgo8L3N2Zz4K">
                 This page generates a new
                 <select onchange="js:setCoin(this.selectedIndex);" class="waves-effect waves-light btn" style="max-width: 20%">
                   <option>Monero</option>
-                  <option>Aeon</option>
+                  <option>Sumokoin</option>
+				  <option>Aeon</option>
                 </select>
                 wallet. It is self contained and
                 does all the necessary calculations locally, so is suitable for generating a new wallet on a machine
                 that is not connected to the network, and may even never be. This way, you can create
-                a Monero/Aeon wallet without risking the keys. This file is GPG signed, see <a href="#gpg-instructions">GPG instructions</a>.
+                a Monero/Sumokoin/Aeon wallet without risking the keys. This file is GPG signed, see <a href="#gpg-instructions">GPG instructions</a>.
                 You can check for up to date versions of this page
-                <a href="https://github.com/moneromooo-monero/monero-wallet-generator/blob/master/monero-wallet-generator.html">here</a>.
+                <a href="https://github.com/sumoshi/monero-wallet-generator/blob/master/monero-wallet-generator.html">here</a>.
             </p>
         </div>
     </div>
@@ -10778,7 +10787,7 @@ bC0zLjUsMjAuNGgtNkwyNDQuOCwzMTAuNkwyNDQuOCwzMTAuNnoiLz4KPC9nPgo8L3N2Zz4K">
                          style="line-height: 25px; height: 25px; font-size: 60%; padding: 0px 1.5rem;"/ id="show_qr_code">
                     </span>
 
-                    <p>This is the address you give to third parties to send aeon/monero to you.
+                    <p>This is the address you give to third parties to send aeon/monero/sumokoin to you.
                         <br><b>It is the only information here that's meant to be public.</b>
                     </p>
                 </div>
@@ -10795,7 +10804,7 @@ bC0zLjUsMjAuNGgtNkwyNDQuOCwzMTAuNkwyNDQuOCwzMTAuNnoiLz4KPC9nPgo8L3N2Zz4K">
                 <div class="card-content pink-text text-darken-5">
                     <span class="card-title pink-text text-darken-5">Mnemonic seed</span>
                     <p>
-                        The mnemonic seed is a string that comprises 24 (Aeon) or 25 (Monero) words and allows you to recreate your
+                        The mnemonic seed is a string that comprises 24 (Aeon) or 25 (Monero/Sumokoin) words and allows you to recreate your
                         private keys. <b>Keep it secure!</b>
                     </p>
                 </div>
@@ -10866,15 +10875,15 @@ being passed around. It is in your interest to check the signature.
 </p>
 <p>
 This page is maintained as a
-<a href="https://github.com/moneromooo-monero/monero-wallet-generator/">git repository</a>.
+<a href="https://github.com/shumoshi/monero-wallet-generator/">git repository</a>.
 All commits are signed. In addition, released versions of the page are signed separately.
 In order to check either, you first need to import
-<a href="https://raw.githubusercontent.com/monero-project/bitmonero/master/utils/gpg_keys/moneromooo.asc">moneromooo's GPG key</a>
+<a href="https://raw.githubusercontent.com/sumoshi/sumokoin/master/utils/gpg_keys/sumoshi.asc">sumoshi's GPG key</a>
 from the Monero source tree:
 </p>
 
 <code>
-gpg --import moneromooo.asc
+gpg --import sumoshi.asc
 </code>
 
 <h5>Checking a standalone signature</h5>
@@ -10882,7 +10891,7 @@ gpg --import moneromooo.asc
 <p>
 You need to get the signature file corresponding to the version of the page you're using.
 Original signature files are
-<a href="https://raw.githubusercontent.com/moneromooo-monero/monero-wallet-generator/master/monero-wallet-generator.html.asc">in the git repository</a>
+<a href="https://raw.githubusercontent.com/sumoshi/monero-wallet-generator/master/monero-wallet-generator.html.asc">in the git repository</a>
 as well. Save it as monero-wallet-generator.html.asc, then:
 </p>
 
@@ -10895,12 +10904,12 @@ You should see a message similar to:
 </p>
 
 <code>
-gpg: Good signature from "moneromooo-monero &lt;moneromooo-monero@users.noreply.github.com&gt;"
+gpg: Good signature from "Sumoshi Tanaka &lt;sumoshi.tanaka@gmail.com&gt;"
 </code>
 
 <p>
 Check the signature is from the key you imported previously! If not, you may be checking
-that file was properly signed by an attacker instead of moneromooo. Beware that anyone can
+that file was properly signed by an attacker instead of sumoshi. Beware that anyone can
 place any email address in a new GPG key, so the right email being shown is no guarantee.
 </p>
 
@@ -10924,7 +10933,7 @@ You should see a message similar to:
 </p>
 
 <code>
-gpg: Good signature from "moneromooo-monero &lt;moneromooo-monero@users.noreply.github.com&gt;"
+gpg: Good signature from "Sumoshi Tanaka &lt;sumoshi.tanaka@gmail.com&gt;"
 </code>
 
 <p>
@@ -10959,16 +10968,16 @@ function genwallet(lang)
   if (lang!=null) {
     current_lang = lang;
   }
-  else {
-    var user_entropy = user_entropy_widget.value;
-    if (user_entropy === "") {
-      seed = cnUtil.sc_reduce32(cnUtil.rand_32());
-    }
-    else {
-      seed = cnUtil.sc_reduce32(poor_mans_kdf(user_entropy));
-    }
-    keys = cnUtil.create_address(seed);
+  
+  var user_entropy = user_entropy_widget.value;
+  if (user_entropy === "") {
+    seed = cnUtil.sc_reduce32(cnUtil.rand_32());
   }
+  else {
+    seed = cnUtil.sc_reduce32(poor_mans_kdf(user_entropy));
+  }
+  keys = cnUtil.create_address(seed);
+  
   mnemonic = mn_encode(seed,current_lang);
 
   spend_key_widget.innerHTML = keys.spend.sec;
@@ -10977,10 +10986,14 @@ function genwallet(lang)
   address_qr_widget.innerHTML = "";
   mnemonic_widget.innerHTML = mnemonic;
 
-  // only monero has the URI scheme
+  // only monero and sumokoin has the URI scheme
   if (prefix_widget.value == "4") {
     qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
     qr.makeCode("monero:"+keys.public_addr);
+  }
+  else if(prefix_widget.value == "Sumo"){
+	qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
+    qr.makeCode("sumo:"+keys.public_addr);
   }
   else {
     qr = null;
@@ -11024,7 +11037,13 @@ function genwallet_prefix_worker()
   mnemonic_widget.innerHTML = mnemonic;
 
   qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
-  qr.makeCode("monero:"+keys.public_addr);
+  if (prefix_widget.value == "4") {
+	qr.makeCode("monero:"+keys.public_addr);
+  }
+  else if(prefix_widget.value == "Sumo"){
+	qr.makeCode("sumo:"+keys.public_addr);
+  }
+	
 }
 
 var zerohex="0000000000000000000000000000000000000000000000000000000000000000";
@@ -11141,11 +11160,18 @@ function setCoin(index)
     language = "english"
   }
   else if (index == 1) {
+    cnUtil = cnUtilGen(sumokoinConfig);
+    prefix_widget.value = "Sumo";
+    enable = true
+    language = "english"
+  }
+  else if (index == 2) {
     cnUtil = cnUtilGen(aeonConfig);
     prefix_widget.value = "W";
     enable = false
     language = "electrum"
   }
+  
   enableLanguage("en", enable)
   enableLanguage("es", enable)
   enableLanguage("pt", enable)
@@ -11153,6 +11179,7 @@ function setCoin(index)
   enableElement("show_qr_code", enable)
   genwallet(language);
 }
+
 
 genwallet();
 </script>
