@@ -9001,7 +9001,17 @@ function mn_get_checksum_index(words, prefix_len) {
     return index;
 }
 
-function mn_encode(str, wordset_name) {
+function mn_get_checksum_index2(words, wordset) {
+    var trimmed_words = "";
+    for (var i = 0; i < words.length; i++) {
+        trimmed_words += words[i].slice(0, wordset.prefix_len);
+    }
+    var checksum = crc32.run(trimmed_words);
+    var index = checksum % wordset.words.length;
+    return index;
+}
+
+function mn_encode(str, wordset_name, coin_name) {
     'use strict';
     wordset_name = wordset_name || mn_default_wordset;
     var wordset = mn_words[wordset_name];
@@ -9017,9 +9027,15 @@ function mn_encode(str, wordset_name) {
         var w3 = (Math.floor(Math.floor(x / n) / n) + w2) % n;
         out = out.concat([wordset.words[w1], wordset.words[w2], wordset.words[w3]]);
     }
-    if (wordset.prefix_len > 0) {
+    
+    if(coin_name != "aeon"){
         out.push(out[mn_get_checksum_index(out, wordset.prefix_len)]);
     }
+    
+    if(coin_name == "sumokoin"){
+        out.push(wordset.words[mn_get_checksum_index2(out, wordset)]);
+    }
+    
     return out.join(' ');
 }
 
@@ -10804,7 +10820,7 @@ bC0zLjUsMjAuNGgtNkwyNDQuOCwzMTAuNkwyNDQuOCwzMTAuNnoiLz4KPC9nPgo8L3N2Zz4K">
                 <div class="card-content pink-text text-darken-5">
                     <span class="card-title pink-text text-darken-5">Mnemonic seed</span>
                     <p>
-                        The mnemonic seed is a string that comprises 24 (Aeon) or 25 (Monero/Sumokoin) words and allows you to recreate your
+                        The mnemonic seed is a string that comprises 24 (Aeon) or 25 (Monero) or 26 (Sumokoin) words and allows you to recreate your
                         private keys. <b>Keep it secure!</b>
                     </p>
                 </div>
@@ -10978,25 +10994,29 @@ function genwallet(lang)
   }
   keys = cnUtil.create_address(seed);
   
-  mnemonic = mn_encode(seed,current_lang);
-
   spend_key_widget.innerHTML = keys.spend.sec;
   view_key_widget.innerHTML = keys.view.sec;
   address_widget.innerHTML = cnUtil.pubkeys_to_string(keys.spend.pub, keys.view.pub);
   address_qr_widget.innerHTML = "";
-  mnemonic_widget.innerHTML = mnemonic;
-
+  
   // only monero and sumokoin has the URI scheme
-  if (prefix_widget.value == "4") {
+  wallet_prefix = String(prefix_widget.value);
+  if (wallet_prefix.startsWith("4")) {
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "monero");
     qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
     qr.makeCode("monero:"+keys.public_addr);
   }
-  else if(prefix_widget.value == "Sumo"){
+  else if(wallet_prefix.startsWith("Sumo")){
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "sumokoin");
 	qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
     qr.makeCode("sumo:"+keys.public_addr);
   }
-  else {
-    qr = null;
+  else if(wallet_prefix.startsWith("W")) {
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "aeon");
+    //qr.makeCode(keys.public_addr);
+  }
+  else{
+    alert("Invalid wallet prefix!");
   }
 }
 
@@ -11023,8 +11043,7 @@ function genwallet_prefix_worker()
       return;
     }
   }
-  mnemonic = mn_encode(seed,current_lang);
-
+  
   spend_key_widget = document.getElementById("spend_key_widget");
   view_key_widget = document.getElementById("view_key_widget");
   address_widget = document.getElementById("address_widget");
@@ -11034,16 +11053,26 @@ function genwallet_prefix_worker()
   view_key_widget.innerHTML = keys.view.sec;
   address_widget.innerHTML = keys.public_addr;
   address_qr_widget.innerHTML = "";
-  mnemonic_widget.innerHTML = mnemonic;
-
-  qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
-  if (prefix_widget.value == "4") {
-	qr.makeCode("monero:"+keys.public_addr);
+  
+  // only monero and sumokoin has the URI scheme
+  wallet_prefix = String(prefix_widget.value);
+  if (wallet_prefix.startsWith("4")) {
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "monero");
+    qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
+    qr.makeCode("monero:"+keys.public_addr);
   }
-  else if(prefix_widget.value == "Sumo"){
-	qr.makeCode("sumo:"+keys.public_addr);
+  else if(wallet_prefix.startsWith("Sumo")){
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "sumokoin");
+	qr=new QRCode(address_qr_widget, {correctLevel:QRCode.CorrectLevel.L});
+    qr.makeCode("sumo:"+keys.public_addr);
   }
-	
+  else if(wallet_prefix.startsWith("W")) {
+    mnemonic_widget.innerHTML = mn_encode(seed,current_lang, "aeon");
+    //qr.makeCode(keys.public_addr);
+  }
+  else{
+    alert("Invalid wallet prefix!");
+  }
 }
 
 var zerohex="0000000000000000000000000000000000000000000000000000000000000000";
